@@ -1,4 +1,4 @@
-import { courses as defaultCourses } from './data.js?v=8';
+import { courses as defaultCourses } from './data.js?v=9';
 import { firebaseConfig } from './firebase-config.js';
 
 const STORAGE_KEY = 'albinaaProgressV1';
@@ -82,6 +82,7 @@ function render() {
     visibleCourses += 1;
     const stats = calculate(course);
     const coursePeriod = getCoursePeriod(course);
+    const catchUp = getCatchUpStatus(course);
     const expanded = query ? true : Boolean(state.expandedCourses[course.id]);
     return `
       <article class="course card" data-course-id="${course.id}">
@@ -97,7 +98,11 @@ function render() {
             </div>
             <button class="toggle-course" type="button" aria-expanded="${expanded}" aria-controls="lessons-${course.id}">${expanded ? 'إخفاء' : 'عرض الدروس'}</button>
           </div>
-          <div class="course-meta"><span>${stats.completed} من ${stats.total}</span><span>${stats.percent}%</span></div>
+          <div class="course-meta">
+            <span>${stats.completed} من ${stats.total}</span>
+            ${catchUp ? `<span class="catch-up ${catchUp.kind}">${catchUp.text}</span>` : ''}
+            <span>${stats.percent}%</span>
+          </div>
           <div class="progress" role="progressbar" aria-label="تقدم ${course.title}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${stats.percent}"><span style="width:${stats.percent}%"></span></div>
         </header>
         <ul class="lessons" id="lessons-${course.id}" ${expanded ? '' : 'hidden'}>
@@ -147,6 +152,18 @@ function getCoursePeriod(course) {
   const dates = course.lessons.map(lesson => lesson.scheduledDate).filter(Boolean).sort();
   if (!dates.length) return null;
   return { start: formatScheduledDate(dates[0]), end: formatScheduledDate(dates[dates.length - 1]) };
+}
+
+function getCatchUpStatus(course) {
+  const now = new Date();
+  const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+  const scheduled = course.lessons.filter(lesson => lesson.scheduledDate);
+  if (!scheduled.length) return null;
+  const due = scheduled.filter(lesson => lesson.scheduledDate <= today);
+  if (!due.length) return { kind: 'upcoming', text: 'لم يبدأ بعد' };
+  const remaining = due.filter(lesson => !state.completed[lesson.id]).length;
+  if (!remaining) return { kind: 'on-track', text: 'مكتمل حتى اليوم' };
+  return { kind: 'behind', text: `متبقي للحاق: ${remaining}` };
 }
 
 function escapeText(value) {

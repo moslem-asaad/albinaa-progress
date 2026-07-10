@@ -90,6 +90,10 @@ main { padding-block: 24px 42px; }
 }
 .toggle-course { flex: none; min-height: 42px; padding-inline: 12px; }
 .course-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 11px; color: var(--muted); font-size: .82rem; }
+.catch-up { padding: 2px 8px; border-radius: 999px; font-weight: 700; }
+.catch-up.behind { color: #8a4b22; background: #fff0e3; }
+.catch-up.on-track { color: var(--green-dark); background: var(--green-pale); }
+.catch-up.upcoming { color: var(--muted); background: #f0f3f1; }
 .course .progress { margin-top: 9px; height: 7px; }
 
 .lessons { margin: 0; padding: 0 18px 8px; list-style: none; border-top: 1px solid var(--line); }
@@ -147,6 +151,7 @@ footer { padding: 4px 14px 26px; text-align: center; color: var(--muted); font-s
   .user-name, .sync-status { max-width: none; }
   .lesson-details { grid-template-columns: 1fr; margin-right: 32px; }
   .course-title-row { align-items: flex-start; }
+  .course-meta { flex-wrap: wrap; }
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
