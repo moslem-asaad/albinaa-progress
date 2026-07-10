@@ -2,6 +2,7 @@ export const courses = [
   {
     id: 'sahaba',
     title: 'كيف تأسس جيل الصحابة',
+    url: 'https://www.youtube.com/watch?v=jpoD1Ab9Dbk',
     lessons: [
       { id: 'sahaba-01', title: 'النصف الأول' },
       { id: 'sahaba-02', title: 'النصف الثاني' },
@@ -11,6 +12,7 @@ export const courses = [
   {
     id: 'aqeeda-intro',
     title: 'مدخل إلى علم العقيدة',
+    url: 'https://youtu.be/sbbax79XfAM?si=ZlOoPbUJlQBch0tS',
     lessons: [
       { id: 'aqeeda-intro-01', title: 'النصف الأول' },
       { id: 'aqeeda-intro-02', title: 'النصف الثاني' }
@@ -19,6 +21,7 @@ export const courses = [
   {
     id: 'asmaa',
     title: 'مختصر أسماء الله الحسنى',
+    url: 'https://drive.google.com/file/d/1RGpT9S8n8V-Z38eD-3LHlutgO3ZMaf-7/view?usp=drive_link',
     lessons: [
       { id: 'asmaa-01', title: 'من ص 5 إلى ص 27' },
       { id: 'asmaa-02', title: 'من ص 28 إلى ص 56' },
@@ -30,6 +33,7 @@ export const courses = [
   {
     id: 'riyadh',
     title: 'شرح رياض الصالحين',
+    url: 'https://youtube.com/playlist?list=PLZmiPrHYOIsS5j5KXnB8xMbSjy_7KYbCq&si=hpLPsO0vNeWX62zg',
     lessons: [
       { id: 'riyadh-01', title: 'باب التوبة 2 — النصف الأول' },
       { id: 'riyadh-02', title: 'باب التوبة 2 — النصف الثاني' },
@@ -45,6 +49,7 @@ export const courses = [
   {
     id: 'bag',
     title: 'الحقيبة الشرعية — العقيدة',
+    url: 'https://youtube.com/playlist?list=PLZmiPrHYOIsT0PkIptFKZNq9YG6w9bnYW&si=7FYrZBN56uOwaqnq',
     lessons: [
       { id: 'bag-01', title: 'المحاضرة الأولى' },
       { id: 'bag-02', title: 'المحاضرة الثانية' },
@@ -70,6 +75,7 @@ export const courses = [
   {
     id: 'sawiya',
     title: 'سوية المؤمن',
+    url: 'https://youtube.com/playlist?list=PLZmiPrHYOIsS5j5KXnB8xMbSjy_7KYbCq&si=hpLPsO0vNeWX62zg',
     lessons: [
       { id: 'sawiya-01', title: 'الثبات — النصف الأول' },
       { id: 'sawiya-02', title: 'الثبات — النصف الثاني' },

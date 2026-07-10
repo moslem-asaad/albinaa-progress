@@ -1,4 +1,4 @@
-import { courses } from './data.js';
+import { courses } from './data.js?v=2';
 import { firebaseConfig } from './firebase-config.js';
 
 const STORAGE_KEY = 'albinaaProgressV1';
@@ -65,7 +65,13 @@ function render() {
       <article class="course card" data-course-id="${course.id}">
         <header class="course-header">
           <div class="course-title-row">
-            <h2>${course.title}</h2>
+            <div class="course-title-wrap">
+              <h2>${course.title}</h2>
+              <a class="course-link" href="${escapeAttribute(course.url)}" target="_blank" rel="noopener noreferrer">
+                <span class="link-icon" aria-hidden="true">↗</span>
+                رابط المادة
+              </a>
+            </div>
             <button class="toggle-course" type="button" aria-expanded="${expanded}" aria-controls="lessons-${course.id}">${expanded ? 'إخفاء' : 'عرض الدروس'}</button>
           </div>
           <div class="course-meta"><span>${stats.completed} من ${stats.total}</span><span>${stats.percent}%</span></div>
