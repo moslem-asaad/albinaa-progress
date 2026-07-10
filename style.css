@@ -77,6 +77,7 @@ main { padding-block: 24px 42px; }
 .course-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .course-title-row h2 { margin: 0; font-size: 1.05rem; line-height: 1.55; }
 .course-title-wrap { min-width: 0; }
+.course-period { display: block; margin-top: 3px; color: var(--muted); font-size: .73rem; direction: rtl; }
 .course-link {
   display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; padding: 3px 0;
   color: var(--green); font-size: .8rem; font-weight: 700;
@@ -97,6 +98,8 @@ main { padding-block: 24px 42px; }
 .lesson-main { display: flex; align-items: center; gap: 11px; min-height: 36px; cursor: pointer; }
 .lesson-main input { width: 21px; height: 21px; margin: 0; flex: none; accent-color: var(--green); }
 .lesson-title { line-height: 1.6; }
+.lesson-text { display: grid; gap: 2px; }
+.scheduled-date { width: fit-content; padding: 2px 7px; border-radius: 999px; color: var(--green-dark); background: var(--green-pale); font-size: .7rem; }
 .lesson.completed .lesson-title { color: var(--muted); text-decoration: line-through; }
 .lesson-details { display: grid; grid-template-columns: minmax(120px, 180px) 1fr; gap: 9px; margin: 10px 32px 0 0; }
 .lesson-details input, .lesson-details textarea {

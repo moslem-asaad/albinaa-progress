@@ -1,4 +1,4 @@
-import { courses as defaultCourses } from './data.js?v=6';
+import { courses as defaultCourses } from './data.js?v=8';
 import { firebaseConfig } from './firebase-config.js';
 
 const STORAGE_KEY = 'albinaaProgressV1';
@@ -23,13 +23,23 @@ let currentUser = null;
 let firestoreTimer;
 let noteTimer;
 let openNoteId = null;
+const defaultLessonDates = new Map(defaultCourses.flatMap(course =>
+  course.lessons.map(lesson => [lesson.id, lesson.scheduledDate])
+));
 
 function defaultState() {
   return { version: 1, completed: {}, notes: {}, dates: {}, expandedCourses: {}, courses: null, updatedAt: null };
 }
 
 function getCourses() {
-  return state.courses || defaultCourses;
+  if (!state.courses) return defaultCourses;
+  return state.courses.map(course => ({
+    ...course,
+    lessons: course.lessons.map(lesson => ({
+      ...lesson,
+      scheduledDate: lesson.scheduledDate || defaultLessonDates.get(lesson.id)
+    }))
+  }));
 }
 
 function loadLocalState() {
@@ -71,6 +81,7 @@ function render() {
     if (query && !titleMatch && !lessons.length) return '';
     visibleCourses += 1;
     const stats = calculate(course);
+    const coursePeriod = getCoursePeriod(course);
     const expanded = query ? true : Boolean(state.expandedCourses[course.id]);
     return `
       <article class="course card" data-course-id="${course.id}">
@@ -78,6 +89,7 @@ function render() {
           <div class="course-title-row">
             <div class="course-title-wrap">
               <h2>${course.title}</h2>
+              ${coursePeriod ? `<small class="course-period">من ${coursePeriod.start} إلى ${coursePeriod.end}</small>` : ''}
               <a class="course-link" href="${escapeAttribute(course.url || '#')}" target="_blank" rel="noopener noreferrer" ${course.url ? '' : 'hidden'}>
                 <span class="link-icon" aria-hidden="true">↗</span>
                 رابط المادة
@@ -99,11 +111,15 @@ function render() {
 
 function renderLesson(lesson) {
   const completed = Boolean(state.completed[lesson.id]);
+  const scheduledDate = lesson.scheduledDate ? formatScheduledDate(lesson.scheduledDate) : '';
   return `
     <li class="lesson${completed ? ' completed' : ''}" data-lesson-id="${lesson.id}">
       <label class="lesson-main">
         <input type="checkbox" ${completed ? 'checked' : ''}>
-        <span class="lesson-title">${lesson.title}</span>
+        <span class="lesson-text">
+          <span class="lesson-title">${lesson.title}</span>
+          ${scheduledDate ? `<small class="scheduled-date">الموعد: ${scheduledDate}</small>` : ''}
+        </span>
       </label>
       <div class="lesson-details">
         <label><span class="sr-only">تاريخ ${lesson.title}</span><input class="lesson-date" type="date" value="${escapeAttribute(state.dates[lesson.id] || '')}" aria-label="تاريخ ${lesson.title}"></label>
@@ -119,6 +135,18 @@ function renderLesson(lesson) {
         </div>
       </div>
     </li>`;
+}
+
+function formatScheduledDate(value) {
+  const [year, month, day] = value.split('-').map(Number);
+  const pad = number => String(number).padStart(2, '0');
+  return `${pad(day)}/${pad(month)}/${String(year).slice(-2)}`;
+}
+
+function getCoursePeriod(course) {
+  const dates = course.lessons.map(lesson => lesson.scheduledDate).filter(Boolean).sort();
+  if (!dates.length) return null;
+  return { start: formatScheduledDate(dates[0]), end: formatScheduledDate(dates[dates.length - 1]) };
 }
 
 function escapeText(value) {
