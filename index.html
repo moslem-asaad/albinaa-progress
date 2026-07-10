@@ -36,9 +36,12 @@
       </div>
     </section>
 
-    <section class="search-section" aria-label="البحث">
-      <label class="sr-only" for="searchInput">ابحث في المقررات</label>
-      <input id="searchInput" type="search" placeholder="ابحث في المقررات..." autocomplete="off">
+    <section class="toolbar" aria-label="البحث وإدارة المقررات">
+      <div class="search-section">
+        <label class="sr-only" for="searchInput">ابحث في المقررات</label>
+        <input id="searchInput" type="search" placeholder="ابحث في المقررات..." autocomplete="off">
+      </div>
+      <button id="manageCoursesButton" class="manage-button" type="button">إدارة المقررات</button>
     </section>
 
     <section id="courses" class="courses" aria-label="المقررات"></section>
@@ -46,6 +49,35 @@
   </main>
 
   <footer>يتم حفظ تقدمك تلقائياً</footer>
-  <script type="module" src="./app.js?v=2"></script>
+
+  <dialog id="courseDialog" class="course-dialog">
+    <form id="courseForm" method="dialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">تخصيص المحتوى</p>
+          <h2>إدارة المقررات</h2>
+        </div>
+        <button id="closeCourseDialog" class="icon-button" type="button" aria-label="إغلاق">×</button>
+      </div>
+
+      <label for="courseSelect">المقرر</label>
+      <select id="courseSelect"></select>
+
+      <label for="courseTitle">عنوان المقرر</label>
+      <input id="courseTitle" required>
+
+      <label for="courseUrl">رابط المادة</label>
+      <input id="courseUrl" type="url" dir="ltr" placeholder="https://...">
+
+      <label for="newLessons">دروس جديدة <small>اكتب كل درس في سطر</small></label>
+      <textarea id="newLessons" rows="5" placeholder="الدرس الأول&#10;الدرس الثاني"></textarea>
+
+      <div class="dialog-actions">
+        <button id="newCourseButton" type="button">إضافة مقرر جديد</button>
+        <button class="save-course" type="submit">حفظ</button>
+      </div>
+    </form>
+  </dialog>
+  <script type="module" src="./app.js?v=3"></script>
 </body>
 </html>

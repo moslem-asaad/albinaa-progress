@@ -1,4 +1,4 @@
-import { courses } from './data.js?v=2';
+import { courses as defaultCourses } from './data.js?v=3';
 import { firebaseConfig } from './firebase-config.js';
 
 const STORAGE_KEY = 'albinaaProgressV1';
@@ -8,7 +8,11 @@ const elements = {
   percent: document.querySelector('#overallPercent'), bar: document.querySelector('#overallBar'),
   completed: document.querySelector('#completedCount'), total: document.querySelector('#totalCount'),
   empty: document.querySelector('#emptyState'), auth: document.querySelector('#authButton'),
-  user: document.querySelector('#userName'), status: document.querySelector('#syncStatus')
+  user: document.querySelector('#userName'), status: document.querySelector('#syncStatus'),
+  manage: document.querySelector('#manageCoursesButton'), dialog: document.querySelector('#courseDialog'),
+  courseForm: document.querySelector('#courseForm'), courseSelect: document.querySelector('#courseSelect'),
+  courseTitle: document.querySelector('#courseTitle'), courseUrl: document.querySelector('#courseUrl'),
+  newLessons: document.querySelector('#newLessons')
 };
 
 let state = loadLocalState();
@@ -19,7 +23,11 @@ let firestoreTimer;
 let noteTimer;
 
 function defaultState() {
-  return { version: 1, completed: {}, notes: {}, dates: {}, expandedCourses: {}, updatedAt: null };
+  return { version: 1, completed: {}, notes: {}, dates: {}, expandedCourses: {}, courses: null, updatedAt: null };
+}
+
+function getCourses() {
+  return state.courses || defaultCourses;
 }
 
 function loadLocalState() {
@@ -46,13 +54,14 @@ function normalizeArabic(value) {
 
 function calculate(course) {
   const completed = course.lessons.filter(lesson => state.completed[lesson.id]).length;
-  return { completed, total: course.lessons.length, percent: Math.round(completed / course.lessons.length * 100) };
+  const total = course.lessons.length;
+  return { completed, total, percent: total ? Math.round(completed / total * 100) : 0 };
 }
 
 function render() {
   const query = normalizeArabic(elements.search.value);
   let visibleCourses = 0;
-  elements.courses.innerHTML = courses.map(course => {
+  elements.courses.innerHTML = getCourses().map(course => {
     const titleMatch = normalizeArabic(course.title).includes(query);
     const lessons = query && !titleMatch
       ? course.lessons.filter(lesson => normalizeArabic(lesson.title).includes(query))
@@ -67,7 +76,7 @@ function render() {
           <div class="course-title-row">
             <div class="course-title-wrap">
               <h2>${course.title}</h2>
-              <a class="course-link" href="${escapeAttribute(course.url)}" target="_blank" rel="noopener noreferrer">
+              <a class="course-link" href="${escapeAttribute(course.url || '#')}" target="_blank" rel="noopener noreferrer" ${course.url ? '' : 'hidden'}>
                 <span class="link-icon" aria-hidden="true">↗</span>
                 رابط المادة
               </a>
@@ -110,7 +119,7 @@ function escapeAttribute(value) {
 }
 
 function updateOverall() {
-  const allLessons = courses.flatMap(course => course.lessons);
+  const allLessons = getCourses().flatMap(course => course.lessons);
   const completed = allLessons.filter(lesson => state.completed[lesson.id]).length;
   const percent = Math.round(completed / allLessons.length * 100);
   elements.completed.textContent = completed;
@@ -154,6 +163,61 @@ elements.courses.addEventListener('input', event => {
 });
 
 elements.search.addEventListener('input', render);
+
+function editableCourses() {
+  if (!state.courses) state.courses = structuredClone(defaultCourses);
+  return state.courses;
+}
+
+function fillCourseEditor(courseId) {
+  const course = editableCourses().find(item => item.id === courseId);
+  if (!course) return;
+  elements.courseSelect.value = course.id;
+  elements.courseTitle.value = course.title;
+  elements.courseUrl.value = course.url || '';
+  elements.newLessons.value = '';
+}
+
+function openCourseEditor() {
+  const courses = editableCourses();
+  elements.courseSelect.innerHTML = courses.map(course =>
+    `<option value="${escapeAttribute(course.id)}">${escapeText(course.title)}</option>`
+  ).join('');
+  fillCourseEditor(courses[0].id);
+  elements.dialog.showModal();
+}
+
+function uniqueId(prefix) {
+  const random = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return `${prefix}-${random}`;
+}
+
+elements.manage.addEventListener('click', openCourseEditor);
+elements.courseSelect.addEventListener('change', () => fillCourseEditor(elements.courseSelect.value));
+document.querySelector('#closeCourseDialog').addEventListener('click', () => elements.dialog.close());
+document.querySelector('#newCourseButton').addEventListener('click', () => {
+  const course = { id: uniqueId('course'), title: 'مقرر جديد', url: '', lessons: [] };
+  editableCourses().push(course);
+  const option = document.createElement('option');
+  option.value = course.id;
+  option.textContent = course.title;
+  elements.courseSelect.append(option);
+  fillCourseEditor(course.id);
+  elements.courseTitle.focus();
+});
+
+elements.courseForm.addEventListener('submit', event => {
+  event.preventDefault();
+  const course = editableCourses().find(item => item.id === elements.courseSelect.value);
+  if (!course) return;
+  course.title = elements.courseTitle.value.trim();
+  course.url = elements.courseUrl.value.trim();
+  const additions = elements.newLessons.value.split('\n').map(title => title.trim()).filter(Boolean);
+  course.lessons.push(...additions.map(title => ({ id: uniqueId(course.id), title })));
+  saveLocal();
+  render();
+  elements.dialog.close();
+});
 
 function isFirebaseConfigured() {
   return Object.values(firebaseConfig).every(value => value && !value.includes('YOUR_'));
@@ -236,6 +300,7 @@ function mergeStates(local, remote) {
     notes,
     dates: remoteTime > localTime ? { ...(local.dates || {}), ...(remote.dates || {}) } : { ...(remote.dates || {}), ...(local.dates || {}) },
     expandedCourses: { ...(remote.expandedCourses || {}), ...(local.expandedCourses || {}) },
+    courses: remoteTime > localTime ? (remote.courses || local.courses || null) : (local.courses || remote.courses || null),
     updatedAt: new Date(Math.max(localTime, remoteTime, Date.now())).toISOString()
   };
 }
@@ -253,7 +318,8 @@ async function saveToFirestore(providedModule) {
     const firestoreModule = providedModule || await import(`https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-firestore.js`);
     await firestoreModule.setDoc(firestoreModule.doc(db, 'users', currentUser.uid), {
       version: 1, completed: state.completed, notes: state.notes, dates: state.dates,
-      expandedCourses: state.expandedCourses, updatedAt: firestoreModule.serverTimestamp()
+      expandedCourses: state.expandedCourses, courses: state.courses,
+      updatedAt: firestoreModule.serverTimestamp()
     });
     setStatus('تم الحفظ');
   } catch { setStatus(navigator.onLine ? 'تعذر الحفظ' : 'غير متصل'); }
