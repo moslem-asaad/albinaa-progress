@@ -1,0 +1,20 @@
+export const courses = [
+  { id: 'sahaba-generation', title: 'كيف تأسس جيل الصحابة', lessons: [
+    { id: 'sahaba-generation-01', title: 'النصف الأول' }, { id: 'sahaba-generation-02', title: 'النصف الثاني' }, { id: 'sahaba-generation-03', title: 'النصف الثالث' }
+  ]},
+  { id: 'asma-alhusna', title: 'مختصر أسماء الله الحسنى', lessons: [
+    { id: 'asma-alhusna-01', title: 'من صـ 5 إلى صـ 27' }, { id: 'asma-alhusna-02', title: 'من صـ 28 إلى صـ 56' }, { id: 'asma-alhusna-03', title: 'من صـ 57 إلى صـ 86' }, { id: 'asma-alhusna-04', title: 'من صـ 87 إلى صـ 116' }, { id: 'asma-alhusna-05', title: 'من صـ 117 إلى نهاية الكتاب' }
+  ]},
+  { id: 'riyadh-alsalihin', title: 'شرح رياض الصالحين', lessons: [
+    { id: 'riyadh-alsalihin-01', title: 'باب التوبة 1' }, { id: 'riyadh-alsalihin-02', title: 'باب التوبة 2 | النصف الأول' }, { id: 'riyadh-alsalihin-03', title: 'باب التوبة 2 | النصف الثاني' }, { id: 'riyadh-alsalihin-04', title: 'باب التوبة 3' }, { id: 'riyadh-alsalihin-05', title: 'باب الصبر 1' }, { id: 'riyadh-alsalihin-06', title: 'باب الصبر 2' }, { id: 'riyadh-alsalihin-07', title: 'باب الصبر 2 | النصف الثاني' }, { id: 'riyadh-alsalihin-08', title: 'باب الصبر 3 | النصف الأول' }, { id: 'riyadh-alsalihin-09', title: 'باب الصبر 4' }, { id: 'riyadh-alsalihin-10', title: 'باب الصبر 5' }
+  ]},
+  { id: 'sawiyyat-almumin', title: 'سوية المؤمن', lessons: [
+    { id: 'sawiyyat-almumin-01', title: 'المحاضرة الأولى' }, { id: 'sawiyyat-almumin-02', title: 'المحاضرة الثانية' }, { id: 'sawiyyat-almumin-03', title: 'المحاضرة الثالثة' }, { id: 'sawiyyat-almumin-04', title: 'المحاضرة الرابعة | النصف الأول' }, { id: 'sawiyyat-almumin-05', title: 'المحاضرة الرابعة | النصف الثاني' }, { id: 'sawiyyat-almumin-06', title: 'المحاضرة الخامسة' }, { id: 'sawiyyat-almumin-07', title: 'المحاضرة السادسة' }, { id: 'sawiyyat-almumin-08', title: 'المحاضرة السابعة' }, { id: 'sawiyyat-almumin-09', title: 'المحاضرة الثامنة' }, { id: 'sawiyyat-almumin-10', title: 'المحاضرة التاسعة' }, { id: 'sawiyyat-almumin-11', title: 'المحاضرة العاشرة' }, { id: 'sawiyyat-almumin-12', title: 'المحاضرة الحادية عشرة' }, { id: 'sawiyyat-almumin-13', title: 'المحاضرة الثانية عشرة | النصف الأول' }, { id: 'sawiyyat-almumin-14', title: 'المحاضرة الثانية عشرة | النصف الثاني' }, { id: 'sawiyyat-almumin-15', title: 'المحاضرة الثالثة عشرة' }, { id: 'sawiyyat-almumin-16', title: 'المحاضرة الرابعة عشرة | النصف الأول' }, { id: 'sawiyyat-almumin-17', title: 'المحاضرة الرابعة عشرة | النصف الثاني' }, { id: 'sawiyyat-almumin-18', title: 'المحاضرة الخامسة عشرة | النصف الأول' }, { id: 'sawiyyat-almumin-19', title: 'المحاضرة الخامسة عشرة | النصف الثاني' }
+  ]},
+  { id: 'aqeedah-bag', title: 'الحقيبة الشرعية - العقيدة', lessons: [
+    { id: 'aqeedah-bag-01', title: 'مدخل إلى علم العقيدة' }, { id: 'aqeedah-bag-02', title: 'الثبات | النصف الأول' }, { id: 'aqeedah-bag-03', title: 'الثبات | النصف الثاني' }, { id: 'aqeedah-bag-04', title: 'قوة النفس | النصف الأول' }, { id: 'aqeedah-bag-05', title: 'قوة النفس | النصف الثاني' }, { id: 'aqeedah-bag-06', title: 'الهم والحزن 1 | النصف الأول' }, { id: 'aqeedah-bag-07', title: 'الهم والحزن 1 | النصف الثاني' }, { id: 'aqeedah-bag-08', title: 'الهم والحزن 2 | النصف الأول' }, { id: 'aqeedah-bag-09', title: 'الهم والحزن 2 | النصف الثاني' }, { id: 'aqeedah-bag-10', title: 'التفاؤل' }, { id: 'aqeedah-bag-11', title: 'التوازن' }, { id: 'aqeedah-bag-12', title: 'الصديق والصداقة' }, { id: 'aqeedah-bag-13', title: 'الصبر' }, { id: 'aqeedah-bag-14', title: 'الشتات' }, { id: 'aqeedah-bag-15', title: 'المسؤولية' }, { id: 'aqeedah-bag-16', title: 'العزيمة' }, { id: 'aqeedah-bag-17', title: 'الحياء' }, { id: 'aqeedah-bag-18', title: 'الأمان | النصف الأول' }, { id: 'aqeedah-bag-19', title: 'الأمان | النصف الثاني' }, { id: 'aqeedah-bag-20', title: 'الجود والسخاء والبخل والشح | النصف الأول' }, { id: 'aqeedah-bag-21', title: 'الجود والسخاء والبخل والشح | النصف الثاني' }, { id: 'aqeedah-bag-22', title: 'العفو والصفح' }
+  ]},
+  { id: 'general-followup', title: 'المتابعة العامة', lessons: [
+    { id: 'general-followup-01', title: 'الاستدراك والراحة' }, { id: 'general-followup-02', title: 'اختبار المرحلة الثانية' }
+  ]}
+];

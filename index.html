@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>برنامج البناء الميسر – المرحلة الثانية</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div>
+        <h1>برنامج البناء الميسر</h1>
+        <p>المرحلة الثانية</p>
+      </div>
+      <div class="account" aria-label="الحساب والمزامنة">
+        <span id="userName" class="user-name" hidden></span>
+        <button id="authButton" type="button" disabled>تسجيل الدخول بحساب Google</button>
+        <span id="syncStatus" class="sync-status" role="status">المزامنة السحابية غير مفعلة</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="overall card" aria-labelledby="progressTitle">
+      <div class="overall-heading">
+        <div>
+          <p id="progressTitle" class="eyebrow">التقدم الكلي</p>
+          <strong id="overallPercent" class="overall-percent">0%</strong>
+        </div>
+        <p class="count"><span id="completedCount">0</span> من <span id="totalCount">0</span> درساً</p>
+      </div>
+      <div class="progress" role="progressbar" aria-label="التقدم الكلي" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span id="overallBar"></span>
+      </div>
+    </section>
+
+    <section class="search-section" aria-label="البحث">
+      <label class="sr-only" for="searchInput">ابحث في المقررات</label>
+      <input id="searchInput" type="search" placeholder="ابحث في المقررات..." autocomplete="off">
+    </section>
+
+    <section id="courses" class="courses" aria-label="المقررات"></section>
+    <p id="emptyState" class="empty card" hidden>لا توجد نتائج مطابقة.</p>
+  </main>
+
+  <footer>يتم حفظ تقدمك تلقائياً</footer>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
