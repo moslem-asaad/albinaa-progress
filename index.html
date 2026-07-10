@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>برنامج البناء الميسر – المرحلة الثانية</title>
-  <link rel="stylesheet" href="./style.css?v=4">
+  <link rel="stylesheet" href="./style.css?v=6">
 </head>
 <body>
   <header class="site-header">
@@ -78,6 +78,21 @@
       </div>
     </form>
   </dialog>
-  <script type="module" src="./app.js?v=4"></script>
+
+  <dialog id="notePageDialog" class="note-page-dialog">
+    <div class="note-page-shell">
+      <header class="note-page-header">
+        <div>
+          <p class="eyebrow">ملخص الدرس</p>
+          <h2 id="notePageTitle"></h2>
+        </div>
+        <button id="closeNotePage" class="icon-button" type="button" aria-label="إغلاق صفحة الملاحظات">×</button>
+      </header>
+      <label class="sr-only" for="notePageTextarea">ملخص الدرس</label>
+      <textarea id="notePageTextarea" placeholder="اكتب ملخص الدرس وملاحظاتك هنا..."></textarea>
+      <p class="note-page-hint">يتم حفظ الملخص تلقائياً</p>
+    </div>
+  </dialog>
+  <script type="module" src="./app.js?v=6"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-import { courses as defaultCourses } from './data.js?v=4';
+import { courses as defaultCourses } from './data.js?v=6';
 import { firebaseConfig } from './firebase-config.js';
 
 const STORAGE_KEY = 'albinaaProgressV1';
@@ -12,7 +12,8 @@ const elements = {
   manage: document.querySelector('#manageCoursesButton'), dialog: document.querySelector('#courseDialog'),
   courseForm: document.querySelector('#courseForm'), courseSelect: document.querySelector('#courseSelect'),
   courseTitle: document.querySelector('#courseTitle'), courseUrl: document.querySelector('#courseUrl'),
-  newLessons: document.querySelector('#newLessons')
+  newLessons: document.querySelector('#newLessons'), notePage: document.querySelector('#notePageDialog'),
+  notePageTitle: document.querySelector('#notePageTitle'), notePageTextarea: document.querySelector('#notePageTextarea')
 };
 
 let state = loadLocalState();
@@ -21,6 +22,7 @@ let db;
 let currentUser = null;
 let firestoreTimer;
 let noteTimer;
+let openNoteId = null;
 
 function defaultState() {
   return { version: 1, completed: {}, notes: {}, dates: {}, expandedCourses: {}, courses: null, updatedAt: null };
@@ -105,7 +107,16 @@ function renderLesson(lesson) {
       </label>
       <div class="lesson-details">
         <label><span class="sr-only">تاريخ ${lesson.title}</span><input class="lesson-date" type="date" value="${escapeAttribute(state.dates[lesson.id] || '')}" aria-label="تاريخ ${lesson.title}"></label>
-        <label><span class="sr-only">ملاحظات ${lesson.title}</span><textarea class="lesson-note" placeholder="ملاحظات قصيرة..." aria-label="ملاحظات ${lesson.title}">${escapeText(state.notes[lesson.id] || '')}</textarea></label>
+        <div class="note-field">
+          <div class="note-heading">
+            <span>الملاحظات</span>
+            <span class="note-controls">
+              <button class="expand-note" type="button" aria-expanded="false">تكبير</button>
+              <button class="open-note-page" type="button">فتح كصفحة</button>
+            </span>
+          </div>
+          <label><span class="sr-only">ملاحظات ${lesson.title}</span><textarea class="lesson-note" placeholder="ملاحظات قصيرة..." aria-label="ملاحظات ${lesson.title}">${escapeText(state.notes[lesson.id] || '')}</textarea></label>
+        </div>
       </div>
     </li>`;
 }
@@ -130,6 +141,25 @@ function updateOverall() {
 }
 
 elements.courses.addEventListener('click', event => {
+  const pageButton = event.target.closest('.open-note-page');
+  if (pageButton) {
+    const lesson = pageButton.closest('.lesson');
+    openNoteId = lesson.dataset.lessonId;
+    elements.notePageTitle.textContent = lesson.querySelector('.lesson-title').textContent;
+    elements.notePageTextarea.value = state.notes[openNoteId] || '';
+    elements.notePage.showModal();
+    elements.notePageTextarea.focus();
+    return;
+  }
+  const noteButton = event.target.closest('.expand-note');
+  if (noteButton) {
+    const field = noteButton.closest('.note-field');
+    const expanded = field.classList.toggle('expanded');
+    noteButton.setAttribute('aria-expanded', expanded);
+    noteButton.textContent = expanded ? 'تصغير' : 'تكبير';
+    if (expanded) field.querySelector('textarea').focus();
+    return;
+  }
   const toggle = event.target.closest('.toggle-course');
   if (!toggle || elements.search.value.trim()) return;
   const courseId = toggle.closest('.course').dataset.courseId;
@@ -160,6 +190,28 @@ elements.courses.addEventListener('input', event => {
   state.notes[id] = event.target.value;
   clearTimeout(noteTimer);
   noteTimer = setTimeout(() => saveLocal(), 500);
+});
+
+elements.notePageTextarea.addEventListener('input', () => {
+  if (!openNoteId) return;
+  state.notes[openNoteId] = elements.notePageTextarea.value;
+  const inlineNote = elements.courses.querySelector(`[data-lesson-id="${openNoteId}"] .lesson-note`);
+  if (inlineNote) inlineNote.value = elements.notePageTextarea.value;
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(() => saveLocal(), 500);
+});
+
+function closeNotePage() {
+  clearTimeout(noteTimer);
+  if (openNoteId) saveLocal();
+  openNoteId = null;
+  elements.notePage.close();
+}
+
+document.querySelector('#closeNotePage').addEventListener('click', closeNotePage);
+elements.notePage.addEventListener('cancel', event => {
+  event.preventDefault();
+  closeNotePage();
 });
 
 elements.search.addEventListener('input', render);

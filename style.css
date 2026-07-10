@@ -103,6 +103,13 @@ main { padding-block: 24px 42px; }
   width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 9px 10px; color: var(--ink); background: #fcfdfc;
 }
 .lesson-details textarea { min-height: 64px; resize: vertical; }
+.note-field { min-width: 0; }
+.note-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px; color: var(--muted); font-size: .75rem; }
+.note-controls { display: flex; gap: 5px; }
+.expand-note, .open-note-page { min-height: 30px; padding: 3px 8px; border-color: var(--line); font-size: .72rem; }
+.open-note-page { color: var(--white); background: var(--green); }
+.note-field.expanded { grid-column: 1 / -1; }
+.note-field.expanded textarea { min-height: 220px; background: var(--white); }
 .empty { padding: 28px; text-align: center; color: var(--muted); }
 footer { padding: 4px 14px 26px; text-align: center; color: var(--muted); font-size: .82rem; }
 .course-dialog { width: min(92vw, 560px); padding: 0; border: 0; border-radius: 18px; color: var(--ink); box-shadow: 0 20px 60px rgba(20, 40, 30, .22); }
@@ -120,6 +127,13 @@ footer { padding: 4px 14px 26px; text-align: center; color: var(--muted); font-s
 .course-dialog textarea { resize: vertical; }
 .dialog-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; }
 .save-course { background: var(--green); color: var(--white); }
+.note-page-dialog { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: var(--background); color: var(--ink); }
+.note-page-dialog::backdrop { background: var(--background); }
+.note-page-shell { display: flex; flex-direction: column; width: min(100% - 28px, 900px); height: 100%; margin-inline: auto; padding-block: 22px; }
+.note-page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding-bottom: 16px; }
+.note-page-header h2 { margin: 4px 0 0; font-size: clamp(1.2rem, 4vw, 1.7rem); }
+.note-page-dialog textarea { flex: 1; width: 100%; min-height: 55vh; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); color: var(--ink); font: inherit; font-size: 1.05rem; line-height: 1.9; resize: none; box-shadow: 0 5px 18px rgba(36, 53, 45, .05); }
+.note-page-hint { margin: 10px 4px 0; color: var(--muted); font-size: .78rem; text-align: center; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 @media (max-width: 600px) {
