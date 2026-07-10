@@ -1,4 +1,4 @@
-import { courses as defaultCourses } from './data.js?v=3';
+import { courses as defaultCourses } from './data.js?v=4';
 import { firebaseConfig } from './firebase-config.js';
 
 const STORAGE_KEY = 'albinaaProgressV1';
