@@ -49,6 +49,9 @@ button:disabled { cursor: default; opacity: .55; }
 .user-name, .sync-status { max-width: 250px; font-size: .78rem; color: var(--muted); overflow-wrap: anywhere; }
 
 main { padding-block: 24px 42px; }
+.program-tabs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 18px; padding: 5px; border: 1px solid var(--line); border-radius: 14px; background: var(--white); }
+.program-tab { border-color: transparent; color: var(--muted); background: transparent; }
+.program-tab[aria-selected="true"] { color: var(--white); background: var(--green); box-shadow: 0 4px 12px rgba(63, 128, 99, .18); }
 
 .card {
   background: var(--white); border: 1px solid var(--line); border-radius: 16px;

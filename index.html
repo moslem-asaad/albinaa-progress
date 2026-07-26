@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>برنامج البناء الميسر – المرحلة الثانية</title>
-  <link rel="stylesheet" href="./style.css?v=9">
+  <title>برنامج البناء الميسر</title>
+  <link rel="stylesheet" href="./style.css?v=10">
 </head>
 <body>
   <header class="site-header">
     <div class="container header-content">
       <div>
-        <h1>برنامج البناء الميسر</h1>
-        <p>المرحلة الثانية</p>
+        <h1 id="programName">برنامج البناء الميسر</h1>
+        <p id="programSubtitle">المرحلة الثانية</p>
       </div>
       <div class="account" aria-label="الحساب والمزامنة">
         <span id="userName" class="user-name" hidden></span>
@@ -23,6 +23,8 @@
   </header>
 
   <main class="container">
+    <nav id="programTabs" class="program-tabs" aria-label="مراحل البرنامج"></nav>
+
     <section class="overall card" aria-labelledby="progressTitle">
       <div class="overall-heading">
         <div>
@@ -93,6 +95,6 @@
       <p class="note-page-hint">يتم حفظ الملخص تلقائياً</p>
     </div>
   </dialog>
-  <script type="module" src="./app.js?v=9"></script>
+  <script type="module" src="./app.js?v=10"></script>
 </body>
 </html>

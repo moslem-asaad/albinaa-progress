@@ -1,4 +1,4 @@
-import { courses as defaultCourses } from './data.js?v=9';
+import { programs } from './data.js?v=10';
 import { firebaseConfig } from './firebase-config.js';
 
 const STORAGE_KEY = 'albinaaProgressV1';
@@ -13,7 +13,9 @@ const elements = {
   courseForm: document.querySelector('#courseForm'), courseSelect: document.querySelector('#courseSelect'),
   courseTitle: document.querySelector('#courseTitle'), courseUrl: document.querySelector('#courseUrl'),
   newLessons: document.querySelector('#newLessons'), notePage: document.querySelector('#notePageDialog'),
-  notePageTitle: document.querySelector('#notePageTitle'), notePageTextarea: document.querySelector('#notePageTextarea')
+  notePageTitle: document.querySelector('#notePageTitle'), notePageTextarea: document.querySelector('#notePageTextarea'),
+  programTabs: document.querySelector('#programTabs'), programSubtitle: document.querySelector('#programSubtitle'),
+  programName: document.querySelector('#programName')
 };
 
 let state = loadLocalState();
@@ -23,17 +25,19 @@ let currentUser = null;
 let firestoreTimer;
 let noteTimer;
 let openNoteId = null;
-const defaultLessonDates = new Map(defaultCourses.flatMap(course =>
+const defaultLessonDates = new Map(programs.flatMap(program => program.courses.flatMap(course =>
   course.lessons.map(lesson => [lesson.id, lesson.scheduledDate])
-));
+)));
 
 function defaultState() {
-  return { version: 1, completed: {}, notes: {}, dates: {}, expandedCourses: {}, courses: null, updatedAt: null };
+  return { version: 2, activeProgramId: 'stage2', completed: {}, notes: {}, dates: {}, expandedCourses: {}, programCourses: {}, updatedAt: null };
 }
 
 function getCourses() {
-  if (!state.courses) return defaultCourses;
-  return state.courses.map(course => ({
+  const program = programs.find(item => item.id === state.activeProgramId) || programs[0];
+  const customCourses = state.programCourses?.[program.id] || (program.id === 'stage2' ? state.courses : null);
+  if (!customCourses) return program.courses;
+  return customCourses.map(course => ({
     ...course,
     lessons: course.lessons.map(lesson => ({
       ...lesson,
@@ -45,7 +49,10 @@ function getCourses() {
 function loadLocalState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    return { ...defaultState(), ...saved };
+    const loaded = { ...defaultState(), ...saved, programCourses: { ...(saved.programCourses || {}) } };
+    if (saved.courses && !loaded.programCourses.stage2) loaded.programCourses.stage2 = saved.courses;
+    if (!programs.some(program => program.id === loaded.activeProgramId)) loaded.activeProgramId = 'stage2';
+    return loaded;
   } catch {
     return defaultState();
   }
@@ -71,6 +78,7 @@ function calculate(course) {
 }
 
 function render() {
+  renderProgramTabs();
   const query = normalizeArabic(elements.search.value);
   let visibleCourses = 0;
   elements.courses.innerHTML = getCourses().map(course => {
@@ -112,6 +120,17 @@ function render() {
   }).join('');
   elements.empty.hidden = visibleCourses > 0;
   updateOverall();
+}
+
+function renderProgramTabs() {
+  const active = programs.find(program => program.id === state.activeProgramId) || programs[0];
+  elements.programName.textContent = active.name;
+  elements.programSubtitle.textContent = active.title;
+  document.title = `${active.name} - ${active.title}`;
+  elements.programTabs.innerHTML = programs.map(program => `
+    <button class="program-tab" type="button" role="tab" data-program-id="${program.id}"
+      aria-selected="${program.id === active.id}">${program.name.replace('برنامج ', '')} - ${program.title}</button>
+  `).join('');
 }
 
 function renderLesson(lesson) {
@@ -260,10 +279,20 @@ elements.notePage.addEventListener('cancel', event => {
 });
 
 elements.search.addEventListener('input', render);
+elements.programTabs.addEventListener('click', event => {
+  const tab = event.target.closest('.program-tab');
+  if (!tab || tab.dataset.programId === state.activeProgramId) return;
+  state.activeProgramId = tab.dataset.programId;
+  elements.search.value = '';
+  saveLocal();
+  render();
+});
 
 function editableCourses() {
-  if (!state.courses) state.courses = structuredClone(defaultCourses);
-  return state.courses;
+  const program = programs.find(item => item.id === state.activeProgramId) || programs[0];
+  state.programCourses ||= {};
+  if (!state.programCourses[program.id]) state.programCourses[program.id] = structuredClone(getCourses());
+  return state.programCourses[program.id];
 }
 
 function fillCourseEditor(courseId) {
@@ -391,13 +420,20 @@ function mergeStates(local, remote) {
     const remoteNote = notes[id];
     if (!remoteNote || (localNote && localTime >= remoteTime)) notes[id] = localNote;
   }
+  const localProgramCourses = { ...(local.programCourses || {}) };
+  const remoteProgramCourses = { ...(remote.programCourses || {}) };
+  if (local.courses && !localProgramCourses.stage2) localProgramCourses.stage2 = local.courses;
+  if (remote.courses && !remoteProgramCourses.stage2) remoteProgramCourses.stage2 = remote.courses;
   return {
-    version: 1,
+    version: 2,
+    activeProgramId: local.activeProgramId || remote.activeProgramId || 'stage2',
     completed: { ...(remote.completed || {}), ...(local.completed || {}) },
     notes,
     dates: remoteTime > localTime ? { ...(local.dates || {}), ...(remote.dates || {}) } : { ...(remote.dates || {}), ...(local.dates || {}) },
     expandedCourses: { ...(remote.expandedCourses || {}), ...(local.expandedCourses || {}) },
-    courses: remoteTime > localTime ? (remote.courses || local.courses || null) : (local.courses || remote.courses || null),
+    programCourses: remoteTime > localTime
+      ? { ...localProgramCourses, ...remoteProgramCourses }
+      : { ...remoteProgramCourses, ...localProgramCourses },
     updatedAt: new Date(Math.max(localTime, remoteTime, Date.now())).toISOString()
   };
 }
@@ -414,8 +450,9 @@ async function saveToFirestore(providedModule) {
   try {
     const firestoreModule = providedModule || await import(`https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-firestore.js`);
     await firestoreModule.setDoc(firestoreModule.doc(db, 'users', currentUser.uid), {
-      version: 1, completed: state.completed, notes: state.notes, dates: state.dates,
-      expandedCourses: state.expandedCourses, courses: state.courses,
+      version: 2, activeProgramId: state.activeProgramId,
+      completed: state.completed, notes: state.notes, dates: state.dates,
+      expandedCourses: state.expandedCourses, programCourses: state.programCourses,
       updatedAt: firestoreModule.serverTimestamp()
     });
     setStatus('تم الحفظ');
