@@ -1,4 +1,4 @@
-import { programs } from './data.js?v=10';
+import { programs } from './data.js?v=11';
 import { firebaseConfig } from './firebase-config.js';
 
 const STORAGE_KEY = 'albinaaProgressV1';
@@ -28,6 +28,15 @@ let openNoteId = null;
 const defaultLessonDates = new Map(programs.flatMap(program => program.courses.flatMap(course =>
   course.lessons.map(lesson => [lesson.id, lesson.scheduledDate])
 )));
+const defaultCourseUrls = new Map(programs.flatMap(program =>
+  program.courses.map(course => [course.id, course.url || ''])
+));
+const correctedCourseTitles = new Map([
+  ['شرح نظم المعين', 'شرح نظم المعين في الحديث'],
+  ['مناهج البحث في القضايا الفكرية المعاصرة', 'منهج البحث في القضايا الفكرية المعاصرة'],
+  ['الأفكار المؤسسة للعلمانية', 'الأفكار المؤسلمة للعلمانية'],
+  ['تاريخ الفكر الغربي', 'تاريخ الفكر الغربي الحديث']
+]);
 
 function defaultState() {
   return { version: 2, activeProgramId: 'stage2', completed: {}, notes: {}, dates: {}, expandedCourses: {}, programCourses: {}, updatedAt: null };
@@ -39,6 +48,8 @@ function getCourses() {
   if (!customCourses) return program.courses;
   return customCourses.map(course => ({
     ...course,
+    title: correctedCourseTitles.get(course.title) || course.title,
+    url: course.url || defaultCourseUrls.get(course.id) || '',
     lessons: course.lessons.map(lesson => ({
       ...lesson,
       scheduledDate: lesson.scheduledDate || defaultLessonDates.get(lesson.id)

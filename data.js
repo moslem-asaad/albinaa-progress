@@ -104,7 +104,8 @@ const stage2Courses = [
 
 const stage3Courses = [
   {
-    id: 'stage3-nazm-almueen', title: 'شرح نظم المعين', lessons: [
+    id: 'stage3-nazm-almueen', title: 'شرح نظم المعين في الحديث',
+    url: 'https://www.youtube.com/playlist?list=PLZmiPrHYOIsSppsW3rDVRHqL556H5txHM', lessons: [
       { id: 'stage3-nazm-almueen-01', title: 'المحاضرة 1', scheduledDate: '2026-07-25' },
       { id: 'stage3-nazm-almueen-02', title: 'المحاضرة 2', scheduledDate: '2026-07-26' },
       { id: 'stage3-nazm-almueen-03', title: 'المحاضرة 3', scheduledDate: '2026-07-27' },
@@ -114,19 +115,22 @@ const stage3Courses = [
     ]
   },
   {
-    id: 'stage3-research-methods', title: 'مناهج البحث في القضايا الفكرية المعاصرة', lessons: [
+    id: 'stage3-research-methods', title: 'منهج البحث في القضايا الفكرية المعاصرة',
+    url: 'https://www.youtube.com/playlist?list=PLcWpmYxK9ObvxNrVV3Y-4cPid2wPkGzRb', lessons: [
       { id: 'stage3-research-methods-01', title: 'الثلث الأول', scheduledDate: '2026-07-28' },
       { id: 'stage3-research-methods-02', title: 'الثلث الثاني', scheduledDate: '2026-07-29' },
       { id: 'stage3-research-methods-03', title: 'الثلث الثالث', scheduledDate: '2026-07-30' }
     ]
   },
   {
-    id: 'stage3-secularism', title: 'الأفكار المؤسسة للعلمانية', lessons: [
+    id: 'stage3-secularism', title: 'الأفكار المؤسلمة للعلمانية',
+    url: 'https://www.youtube.com/watch?v=eenwX-whVFY', lessons: [
       { id: 'stage3-secularism-01', title: 'المقرر كامل', scheduledDate: '2026-08-04' }
     ]
   },
   {
-    id: 'stage3-civil-discourse', title: 'مآلات الخطاب المدني', lessons: [
+    id: 'stage3-civil-discourse', title: 'مآلات الخطاب المدني',
+    url: 'https://drive.google.com/file/d/1BBGaKdiXoOoO0V62tAQPPN7KSwpJW70X/view', lessons: [
       { id: 'stage3-civil-discourse-01', title: 'من صـ 9 إلى صـ 21', scheduledDate: '2026-08-05' },
       { id: 'stage3-civil-discourse-02', title: 'من صـ 22 إلى صـ 47', scheduledDate: '2026-08-06' },
       { id: 'stage3-civil-discourse-03', title: 'من صـ 49 إلى صـ 78', scheduledDate: '2026-08-11' },
@@ -143,7 +147,8 @@ const stage3Courses = [
     ]
   },
   {
-    id: 'stage3-language-hadith', title: 'شرح لغة المحدث', lessons: [
+    id: 'stage3-language-hadith', title: 'شرح لغة المحدث',
+    url: 'https://drive.google.com/file/d/1KrClt3-j32ozkhL6Ol9LzwqPo89F2bgJ/view', lessons: [
       { id: 'stage3-language-hadith-01', title: 'من صـ 5 إلى صـ 53', scheduledDate: '2026-08-08' },
       { id: 'stage3-language-hadith-02', title: 'من صـ 54 إلى صـ 73', scheduledDate: '2026-08-09' },
       { id: 'stage3-language-hadith-03', title: 'من صـ 74 إلى صـ 90', scheduledDate: '2026-08-10' },
@@ -168,7 +173,8 @@ const stage3Courses = [
     ]
   },
   {
-    id: 'stage3-western-thought', title: 'تاريخ الفكر الغربي', lessons: [
+    id: 'stage3-western-thought', title: 'تاريخ الفكر الغربي الحديث',
+    url: 'https://www.youtube.com/playlist?list=PLZmiPrHYOIsQMpwdg-LEUnb7c1LDxkQv5', lessons: [
       { id: 'stage3-western-thought-01', title: 'المحاضرة الأولى', scheduledDate: '2026-09-03' },
       { id: 'stage3-western-thought-02', title: 'المحاضرة الثانية - النصف الأول', scheduledDate: '2026-09-08' },
       { id: 'stage3-western-thought-03', title: 'المحاضرة الثانية - النصف الثاني', scheduledDate: '2026-09-09' },
@@ -186,7 +192,8 @@ const stage3Courses = [
     ]
   },
   {
-    id: 'stage3-knowledge-bearers', title: 'حملة العلم وحفظة الشريعة', lessons: [
+    id: 'stage3-knowledge-bearers', title: 'حملة العلم وحفظة الشريعة',
+    url: 'https://www.youtube.com/playlist?list=PLZmiPrHYOIsScpWE8OHC_saqUIZMQmsFe', lessons: [
       { id: 'stage3-knowledge-bearers-01', title: 'المحاضرة الأولى - النصف الأول', scheduledDate: '2026-09-26' },
       { id: 'stage3-knowledge-bearers-02', title: 'المحاضرة الأولى - النصف الثاني', scheduledDate: '2026-09-27' },
       { id: 'stage3-knowledge-bearers-03', title: 'المحاضرة الثانية - النصف الأول', scheduledDate: '2026-09-28' },
@@ -201,7 +208,8 @@ const stage3Courses = [
     ]
   },
   {
-    id: 'stage3-almirqah', title: 'المرقاة', lessons: [
+    id: 'stage3-almirqah', title: 'المرقاة',
+    url: 'https://drive.google.com/file/d/1Jlcvz8wYenu-H0ec9BydssYkQp-y4GKk/view', lessons: [
       { id: 'stage3-almirqah-01', title: 'من صـ 8 إلى صـ 52', scheduledDate: '2026-10-07' },
       { id: 'stage3-almirqah-02', title: 'من صـ 53 إلى صـ 87', scheduledDate: '2026-10-08' },
       { id: 'stage3-almirqah-03', title: 'من صـ 88 إلى صـ 119', scheduledDate: '2026-10-13' },
@@ -209,7 +217,8 @@ const stage3Courses = [
     ]
   },
   {
-    id: 'stage3-sawiya', title: 'سوية المؤمن', lessons: [
+    id: 'stage3-sawiya', title: 'سوية المؤمن',
+    url: 'https://www.youtube.com/playlist?list=PLZmiPrHYOIsS5j5KXnB8xMbSjy_7KYbCq', lessons: [
       { id: 'stage3-sawiya-01', title: 'العزيمة', scheduledDate: '2026-10-15' },
       { id: 'stage3-sawiya-02', title: 'الشتات', scheduledDate: '2026-10-20' },
       { id: 'stage3-sawiya-03', title: 'المسؤولية', scheduledDate: '2026-10-21' },
@@ -217,7 +226,8 @@ const stage3Courses = [
     ]
   },
   {
-    id: 'stage3-hadith-methods', title: 'مناهج المحدثين', lessons: [
+    id: 'stage3-hadith-methods', title: 'مناهج المحدثين',
+    url: 'https://drive.google.com/file/d/1mVN4_29vTL6MXE3-y5cHLCcWO-lO0jNf/view', lessons: [
       { id: 'stage3-hadith-methods-01', title: 'من صـ 5 إلى صـ 33', scheduledDate: '2026-10-19' },
       { id: 'stage3-hadith-methods-02', title: 'من صـ 34 إلى صـ 66', scheduledDate: '2026-10-24' },
       { id: 'stage3-hadith-methods-03', title: 'من صـ 67 إلى صـ 97', scheduledDate: '2026-10-25' },
