@@ -68,6 +68,52 @@ service cloud.firestore {
 
 تسمح هذه القواعد للمستخدم المسجل بالدخول بقراءة وكتابة وثيقته فقط في `users/{uid}`، ولا تسمح له بالوصول إلى وثائق المستخدمين الآخرين.
 
+### تفعيل ملفات PDF مجاناً عبر Supabase
+
+يستخدم الموقع Firebase للتسجيل وحفظ التقدم، وSupabase Storage المجاني لحفظ ملفات PDF.
+
+1. في Supabase افتح **Authentication → Third-Party Auth**، وأضف **Firebase** باستخدام Project ID: `albinaa-progress`.
+2. افتح **SQL Editor → New query**.
+3. الصق الاستعلام التالي وشغّله مرة واحدة:
+
+```sql
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('lesson-pdfs', 'lesson-pdfs', false, 20971520, array['application/pdf'])
+on conflict (id) do update set
+  public = false,
+  file_size_limit = 20971520,
+  allowed_mime_types = array['application/pdf'];
+
+create policy "Firebase users upload their PDFs"
+on storage.objects for insert to anon
+with check (
+  bucket_id = 'lesson-pdfs'
+  and (storage.foldername(name))[1] = (auth.jwt()->>'sub')
+  and auth.jwt()->>'iss' = 'https://securetoken.google.com/albinaa-progress'
+  and auth.jwt()->>'aud' = 'albinaa-progress'
+);
+
+create policy "Firebase users read their PDFs"
+on storage.objects for select to anon
+using (
+  bucket_id = 'lesson-pdfs'
+  and (storage.foldername(name))[1] = (auth.jwt()->>'sub')
+  and auth.jwt()->>'iss' = 'https://securetoken.google.com/albinaa-progress'
+  and auth.jwt()->>'aud' = 'albinaa-progress'
+);
+
+create policy "Firebase users delete their PDFs"
+on storage.objects for delete to anon
+using (
+  bucket_id = 'lesson-pdfs'
+  and (storage.foldername(name))[1] = (auth.jwt()->>'sub')
+  and auth.jwt()->>'iss' = 'https://securetoken.google.com/albinaa-progress'
+  and auth.jwt()->>'aud' = 'albinaa-progress'
+);
+```
+
+الإعدادات العامة للاتصال موجودة في `supabase-config.js`. الـbucket خاص، وروابط الفتح مؤقتة لعشر دقائق، وكل مستخدم يستطيع الوصول فقط إلى المجلد المطابق لمعرّفه في Firebase. لا تضع Database Password أو `service_role` key داخل المشروع.
+
 ## النشر على GitHub Pages
 
 1. أنشئ مستودع GitHub جديداً.

@@ -1,5 +1,6 @@
 import { programs } from './data.js?v=11';
 import { firebaseConfig } from './firebase-config.js';
+import { supabaseConfig } from './supabase-config.js';
 
 const STORAGE_KEY = 'albinaaProgressV1';
 const FIREBASE_VERSION = '12.1.0';
@@ -21,6 +22,7 @@ const elements = {
 let state = loadLocalState();
 let auth;
 let db;
+let supabase;
 let currentUser = null;
 let firestoreTimer;
 let noteTimer;
@@ -39,7 +41,7 @@ const correctedCourseTitles = new Map([
 ]);
 
 function defaultState() {
-  return { version: 2, activeProgramId: 'stage2', completed: {}, notes: {}, dates: {}, expandedCourses: {}, programCourses: {}, updatedAt: null };
+  return { version: 3, activeProgramId: 'stage2', completed: {}, notes: {}, dates: {}, attachments: {}, expandedCourses: {}, programCourses: {}, updatedAt: null };
 }
 
 function getCourses() {
@@ -147,6 +149,7 @@ function renderProgramTabs() {
 function renderLesson(lesson) {
   const completed = Boolean(state.completed[lesson.id]);
   const scheduledDate = lesson.scheduledDate ? formatScheduledDate(lesson.scheduledDate) : '';
+  const attachments = state.attachments?.[lesson.id] || [];
   return `
     <li class="lesson${completed ? ' completed' : ''}" data-lesson-id="${lesson.id}">
       <label class="lesson-main">
@@ -168,8 +171,40 @@ function renderLesson(lesson) {
           </div>
           <label><span class="sr-only">ملاحظات ${lesson.title}</span><textarea class="lesson-note" placeholder="ملاحظات قصيرة..." aria-label="ملاحظات ${lesson.title}">${escapeText(state.notes[lesson.id] || '')}</textarea></label>
         </div>
+        <section class="lesson-files" aria-label="ملفات ${escapeAttribute(lesson.title)}">
+          <div class="files-heading">
+            <div><strong>ملفات الدرس</strong><small>PDF · حتى 20MB</small></div>
+            <div class="files-heading-actions">
+              <button class="toggle-files" type="button" aria-expanded="true" aria-controls="files-${escapeAttribute(lesson.id)}">طي القائمة</button>
+              <label class="upload-pdf ${currentUser ? '' : 'disabled'}">
+                <input class="pdf-input" type="file" accept="application/pdf,.pdf" multiple ${currentUser ? '' : 'disabled'}>
+                <span>${currentUser ? 'رفع PDF' : 'سجّل الدخول للرفع'}</span>
+              </label>
+            </div>
+          </div>
+          <div class="files-content" id="files-${escapeAttribute(lesson.id)}">
+            <p class="upload-status" role="status" hidden></p>
+            <ul class="file-list" ${attachments.length ? '' : 'hidden'}>
+              ${attachments.map(file => `
+                <li data-file-id="${escapeAttribute(file.id)}" data-file-path="${escapeAttribute(file.path)}">
+                  <span class="file-icon" aria-hidden="true">PDF</span>
+                  <span class="file-info"><strong title="${escapeAttribute(file.name)}">${escapeText(file.name)}</strong><small>${formatFileSize(file.size)}</small></span>
+                  <span class="file-actions">
+                    <button class="open-pdf" type="button" aria-label="فتح ${escapeAttribute(file.name)}">فتح</button>
+                    <button class="delete-pdf" type="button" aria-label="حذف ${escapeAttribute(file.name)}">حذف</button>
+                  </span>
+                </li>`).join('')}
+            </ul>
+            <p class="no-files" ${attachments.length ? 'hidden' : ''}>لا توجد ملفات مرفوعة بعد</p>
+          </div>
+        </section>
       </div>
     </li>`;
+}
+
+function formatFileSize(bytes = 0) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function formatScheduledDate(value) {
@@ -216,6 +251,25 @@ function updateOverall() {
 }
 
 elements.courses.addEventListener('click', event => {
+  const filesToggle = event.target.closest('.toggle-files');
+  if (filesToggle) {
+    const content = filesToggle.closest('.lesson-files').querySelector('.files-content');
+    const expanded = filesToggle.getAttribute('aria-expanded') === 'true';
+    filesToggle.setAttribute('aria-expanded', String(!expanded));
+    filesToggle.textContent = expanded ? 'عرض القائمة' : 'طي القائمة';
+    content.hidden = expanded;
+    return;
+  }
+  const openButton = event.target.closest('.open-pdf');
+  if (openButton) {
+    openPdf(openButton);
+    return;
+  }
+  const deleteButton = event.target.closest('.delete-pdf');
+  if (deleteButton) {
+    deletePdf(deleteButton);
+    return;
+  }
   const pageButton = event.target.closest('.open-note-page');
   if (pageButton) {
     const lesson = pageButton.closest('.lesson');
@@ -247,7 +301,9 @@ elements.courses.addEventListener('change', event => {
   const lesson = event.target.closest('.lesson');
   if (!lesson) return;
   const id = lesson.dataset.lessonId;
-  if (event.target.matches('input[type="checkbox"]')) {
+  if (event.target.matches('.pdf-input')) {
+    uploadPdf(event.target, id);
+  } else if (event.target.matches('input[type="checkbox"]')) {
     if (event.target.checked) state.completed[id] = true;
     else delete state.completed[id];
     saveLocal();
@@ -258,6 +314,94 @@ elements.courses.addEventListener('change', event => {
     saveLocal();
   }
 });
+
+async function uploadPdf(input, lessonId) {
+  const files = [...(input.files || [])];
+  if (!files.length) return;
+  const status = input.closest('.lesson-files').querySelector('.upload-status');
+  const invalidType = files.find(file => file.type !== 'application/pdf' && !file.name.toLocaleLowerCase().endsWith('.pdf'));
+  if (invalidType) return showUploadStatus(status, `الملف «${invalidType.name}» ليس PDF`, true);
+  const oversized = files.find(file => file.size > 20 * 1024 * 1024);
+  if (oversized) return showUploadStatus(status, `الملف «${oversized.name}» أكبر من 20MB`, true);
+  if (!currentUser || !supabase) return showUploadStatus(status, 'سجّل الدخول أولاً لرفع الملف', true);
+  input.disabled = true;
+  const uploaded = [];
+  try {
+    for (const [index, file] of files.entries()) {
+      showUploadStatus(status, `جاري رفع ${index + 1} من ${files.length}: ${file.name}`);
+      const fileId = uniqueId('pdf');
+      const path = `${currentUser.uid}/${lessonId}/${fileId}.pdf`;
+      const { error } = await supabase.storage.from(supabaseConfig.bucket).upload(path, file, {
+        contentType: 'application/pdf', upsert: false
+      });
+      if (error) throw error;
+      uploaded.push({ id: fileId, name: file.name, path, size: file.size });
+    }
+    state.attachments ||= {};
+    state.attachments[lessonId] ||= [];
+    state.attachments[lessonId].push(...uploaded);
+    saveLocal();
+    render();
+  } catch (error) {
+    console.error(error);
+    if (uploaded.length) {
+      state.attachments ||= {};
+      state.attachments[lessonId] ||= [];
+      state.attachments[lessonId].push(...uploaded);
+      saveLocal();
+      render();
+    }
+    input.disabled = false;
+    alert(`تم رفع ${uploaded.length} من ${files.length}. تعذر إكمال بقية الملفات.`);
+  }
+}
+
+async function openPdf(button) {
+  if (!currentUser || !supabase) return alert('سجّل الدخول أولاً لفتح الملف.');
+  const fileRow = button.closest('[data-file-id]');
+  if (!fileRow) return;
+  const popup = window.open('', '_blank');
+  button.disabled = true;
+  try {
+    const { data, error } = await supabase.storage.from(supabaseConfig.bucket).createSignedUrl(fileRow.dataset.filePath, 60 * 10);
+    if (error) throw error;
+    if (popup) popup.location.href = data.signedUrl;
+    else window.location.href = data.signedUrl;
+  } catch (error) {
+    console.error(error);
+    popup?.close();
+    alert('تعذر فتح الملف. تأكد من إعداد Supabase وسياسات الوصول.');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function deletePdf(button) {
+  if (!currentUser || !supabase) return;
+  const lesson = button.closest('.lesson');
+  const fileRow = button.closest('[data-file-id]');
+  if (!lesson || !fileRow || !confirm('هل تريد حذف هذا الملف؟')) return;
+  button.disabled = true;
+  try {
+    const { error } = await supabase.storage.from(supabaseConfig.bucket).remove([fileRow.dataset.filePath]);
+    if (error) throw error;
+    const lessonId = lesson.dataset.lessonId;
+    state.attachments[lessonId] = (state.attachments[lessonId] || []).filter(file => file.id !== fileRow.dataset.fileId);
+    if (!state.attachments[lessonId].length) delete state.attachments[lessonId];
+    saveLocal();
+    render();
+  } catch (error) {
+    console.error(error);
+    button.disabled = false;
+    alert('تعذر حذف الملف. حاول مرة أخرى.');
+  }
+}
+
+function showUploadStatus(element, message, isError = false) {
+  element.hidden = false;
+  element.textContent = message;
+  element.classList.toggle('error', isError);
+}
 
 elements.courses.addEventListener('input', event => {
   if (!event.target.matches('.lesson-note')) return;
@@ -373,6 +517,7 @@ async function initializeFirebase() {
     const firebaseApp = appModule.initializeApp(firebaseConfig);
     auth = authModule.getAuth(firebaseApp);
     db = firestoreModule.getFirestore(firebaseApp);
+    await initializeSupabase();
     elements.auth.disabled = false;
     elements.auth.addEventListener('click', () => handleAuth(authModule));
     try { await authModule.getRedirectResult(auth); } catch { setStatus('تعذر الحفظ'); }
@@ -381,6 +526,14 @@ async function initializeFirebase() {
     elements.auth.disabled = true;
     setStatus(navigator.onLine ? 'تعذر الحفظ' : 'غير متصل');
   }
+}
+
+async function initializeSupabase() {
+  if (!supabaseConfig.url || !supabaseConfig.publishableKey) return;
+  const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  supabase = createClient(supabaseConfig.url, supabaseConfig.publishableKey, {
+    accessToken: async () => currentUser ? currentUser.getIdToken(false) : null
+  });
 }
 
 async function handleAuth(authModule) {
@@ -403,7 +556,7 @@ async function handleAuthChange(user, firestoreModule) {
   elements.auth.textContent = user ? 'تسجيل الخروج' : 'تسجيل الدخول بحساب Google';
   elements.user.hidden = !user;
   elements.user.textContent = user ? (user.displayName || user.email || '') : '';
-  if (!user) { setStatus(navigator.onLine ? 'محفوظ محلياً' : 'غير متصل'); return; }
+  if (!user) { setStatus(navigator.onLine ? 'محفوظ محلياً' : 'غير متصل'); render(); return; }
   setStatus(navigator.onLine ? 'جاري الحفظ...' : 'غير متصل');
   if (!navigator.onLine) return;
   try {
@@ -436,11 +589,14 @@ function mergeStates(local, remote) {
   if (local.courses && !localProgramCourses.stage2) localProgramCourses.stage2 = local.courses;
   if (remote.courses && !remoteProgramCourses.stage2) remoteProgramCourses.stage2 = remote.courses;
   return {
-    version: 2,
+    version: 3,
     activeProgramId: local.activeProgramId || remote.activeProgramId || 'stage2',
     completed: { ...(remote.completed || {}), ...(local.completed || {}) },
     notes,
     dates: remoteTime > localTime ? { ...(local.dates || {}), ...(remote.dates || {}) } : { ...(remote.dates || {}), ...(local.dates || {}) },
+    attachments: remoteTime > localTime
+      ? { ...(local.attachments || {}), ...(remote.attachments || {}) }
+      : { ...(remote.attachments || {}), ...(local.attachments || {}) },
     expandedCourses: { ...(remote.expandedCourses || {}), ...(local.expandedCourses || {}) },
     programCourses: remoteTime > localTime
       ? { ...localProgramCourses, ...remoteProgramCourses }
@@ -461,9 +617,9 @@ async function saveToFirestore(providedModule) {
   try {
     const firestoreModule = providedModule || await import(`https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-firestore.js`);
     await firestoreModule.setDoc(firestoreModule.doc(db, 'users', currentUser.uid), {
-      version: 2, activeProgramId: state.activeProgramId,
+      version: 3, activeProgramId: state.activeProgramId,
       completed: state.completed, notes: state.notes, dates: state.dates,
-      expandedCourses: state.expandedCourses, programCourses: state.programCourses,
+      attachments: state.attachments, expandedCourses: state.expandedCourses, programCourses: state.programCourses,
       updatedAt: firestoreModule.serverTimestamp()
     });
     setStatus('تم الحفظ');
