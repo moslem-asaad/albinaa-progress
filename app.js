@@ -1,4 +1,4 @@
-import { programs } from './data.js?v=11';
+import { programs } from './data.js?v=17';
 import { firebaseConfig } from './firebase-config.js';
 import { supabaseConfig } from './supabase-config.js';
 
@@ -214,7 +214,7 @@ function formatScheduledDate(value) {
 }
 
 function getCoursePeriod(course) {
-  const dates = course.lessons.map(lesson => lesson.scheduledDate).filter(Boolean).sort();
+  const dates = course.lessons.flatMap(lesson => [lesson.scheduledDate, lesson.endDate]).filter(Boolean).sort();
   if (!dates.length) return null;
   return { start: formatScheduledDate(dates[0]), end: formatScheduledDate(dates[dates.length - 1]) };
 }

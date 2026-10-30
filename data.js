@@ -245,7 +245,67 @@ const stage3Courses = [
   }
 ];
 
+const stage4Courses = [
+  {
+    id: 'stage4-text-methodology', title: 'مقدمة منهجية لفهم النصوص الشرعية',
+    url: 'https://youtu.be/awZeSmsM_wA', lessons: [
+      { id: 'stage4-text-methodology-01', title: 'النصف الأول', scheduledDate: '2026-10-17' },
+      { id: 'stage4-text-methodology-02', title: 'النصف الثاني', scheduledDate: '2026-10-18' }
+    ]
+  },
+  {
+    id: 'stage4-maqasid', title: 'مقاصد السور',
+    url: 'https://youtube.com/playlist?list=PLZmiPrHYOIsSUYQocH46buncMe2uH3D-l&si=1_2kKG-a4HSP0887', lessons: [
+      { id: 'stage4-maqasid-01', title: 'سورة الحديد — النصف الأول', scheduledDate: '2026-10-19' },
+      { id: 'stage4-maqasid-02', title: 'سورة الحديد — النصف الثاني', scheduledDate: '2026-10-20' },
+      { id: 'stage4-maqasid-03', title: 'سورة الأحزاب', scheduledDate: '2026-10-21' },
+      { id: 'stage4-maqasid-04', title: 'سورة المزمل', scheduledDate: '2026-10-26' },
+      { id: 'stage4-maqasid-05', title: 'سورة النجم', scheduledDate: '2026-10-27' },
+      { id: 'stage4-maqasid-06', title: 'سورة الطور', scheduledDate: '2026-10-28' },
+      { id: 'stage4-maqasid-07', title: 'سورة الأحقاف — النصف الأول', scheduledDate: '2026-11-03' },
+      { id: 'stage4-maqasid-08', title: 'سورة الأحقاف — النصف الثاني', scheduledDate: '2026-11-04' }
+    ]
+  },
+  {
+    id: 'stage4-riyadh', title: 'شرح رياض الصالحين', lessons: [
+      { id: 'stage4-riyadh-01', title: 'باب الصدق', scheduledDate: '2026-10-22' },
+      { id: 'stage4-riyadh-02', title: 'باب المراقبة 1', scheduledDate: '2026-10-29' },
+      { id: 'stage4-riyadh-03', title: 'باب المراقبة 2', scheduledDate: '2026-11-05' },
+      { id: 'stage4-riyadh-04', title: 'باب المراقبة 3', scheduledDate: '2026-11-12' },
+      { id: 'stage4-riyadh-05', title: 'باب التقوى', scheduledDate: '2026-11-16' }
+    ]
+  },
+  {
+    id: 'stage4-fiqh-intro', title: 'المدخل إلى علم الفقه',
+    url: 'https://www.youtube.com/playlist?list=PLcWpmYxK9Obu4er6e2nxCERPFsWOcNRCg', lessons: [
+      { id: 'stage4-fiqh-intro-01', title: 'المحاضرة الأولى', scheduledDate: '2026-10-24' },
+      { id: 'stage4-fiqh-intro-02', title: 'المحاضرة الثانية', scheduledDate: '2026-10-25' },
+      { id: 'stage4-fiqh-intro-03', title: 'المحاضرة الثالثة', scheduledDate: '2026-10-31' },
+      { id: 'stage4-fiqh-intro-04', title: 'المحاضرة الرابعة', scheduledDate: '2026-11-01' },
+      { id: 'stage4-fiqh-intro-05', title: 'المحاضرة الخامسة', scheduledDate: '2026-11-02' },
+      { id: 'stage4-fiqh-intro-06', title: 'المحاضرة السادسة', scheduledDate: '2026-11-07' },
+      { id: 'stage4-fiqh-intro-07', title: 'المحاضرة السابعة والأخيرة', scheduledDate: '2026-11-08' }
+    ]
+  },
+  {
+    id: 'stage4-sunnah-doubt', title: 'أفي السنة شك؟!',
+    url: 'https://drive.google.com/file/d/1KJuiXTY52rvN8rKftNos1xFOt_KAqru0/view?usp=drive_link', lessons: [
+      { id: 'stage4-sunnah-doubt-01', title: 'من صـ 7 إلى صـ 30', scheduledDate: '2026-11-09' },
+      { id: 'stage4-sunnah-doubt-02', title: 'من صـ 31 إلى صـ 54', scheduledDate: '2026-11-10' },
+      { id: 'stage4-sunnah-doubt-03', title: 'من صـ 55 إلى صـ 78', scheduledDate: '2026-11-11' },
+      { id: 'stage4-sunnah-doubt-04', title: 'من صـ 79 إلى صـ 105', scheduledDate: '2026-11-14' },
+      { id: 'stage4-sunnah-doubt-05', title: 'من صـ 106 إلى نهاية الكتاب', scheduledDate: '2026-11-15' }
+    ]
+  },
+  {
+    id: 'stage4-final-exam', title: 'الاختبار النهائي', lessons: [
+      { id: 'stage4-final-exam-01', title: 'الاختبار النهائي للمرحلة الرابعة — من 21 إلى 27 نوفمبر', scheduledDate: '2026-11-21', endDate: '2026-11-27' }
+    ]
+  }
+];
+
 export const programs = [
   { id: 'stage2', name: 'برنامج البناء الميسر', title: 'المرحلة الثانية', courses: stage2Courses },
-  { id: 'stage3', name: 'برنامج البناء المنهجي', title: 'المرحلة الثالثة', courses: stage3Courses }
+  { id: 'stage3', name: 'برنامج البناء المنهجي', title: 'المرحلة الثالثة', courses: stage3Courses },
+  { id: 'stage4', name: 'برنامج البناء الميسر', title: 'المرحلة الرابعة', courses: stage4Courses }
 ];
